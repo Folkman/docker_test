@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  localstack_test:
+    image: localstack/localstack-pro:1.3
+    ports:
+      - "127.0.0.1:53:53"
+      - "127.0.0.1:53:53/udp"
+      - "127.0.0.1:443:443"
+      - "127.0.0.1:4510-4530:4510-4530"
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4571:4571"
+    environment:
+      - LOCALSTACK_API_KEY
+      - services=sns,sqs,lambda,dynamodb,events
+      - DEBUG=1
+      - HOSTNAME_EXTERNAL=localstack_test
+      - LAMBDA_REMOTE_DOCKER=true
+      - LAMBDA_REMOVE_CONTAINERS=false
+      - LAMBDA_EXECUTOR=docker-reuse
+      - PROVIDER_OVERRIDE_lambda=asf
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    privileged: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./localstack/init:/etc/localstack/init/ready.d
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
